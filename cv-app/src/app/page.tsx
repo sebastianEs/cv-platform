@@ -1,103 +1,228 @@
-import Image from "next/image";
+// app/page.tsx
+"use client";
+
+import { useState } from "react";
+import {
+  PDFDownloadLink,
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+} from "@react-pdf/renderer";
+
+const PDF_FILE_NAME = "resume.pdf";
+
+const styles = StyleSheet.create({
+  page: { padding: 30, fontSize: 12 },
+  section: { marginBottom: 12 },
+  header: { fontSize: 18, marginBottom: 5, fontWeight: "bold", textTransform: "uppercase" },
+  subHeader: { fontSize: 14, marginBottom: 3, fontWeight: "semibold", textTransform: "uppercase" },
+  expItem: { marginBottom: 6 },
+  expTitle: { fontSize: 12, fontWeight: "bold" },
+  expDescription: { fontSize: 10 },
+});
+
+const MyCV = ({ data }: { data: any }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.section}>
+        <Text style={styles.header}>{data.name}</Text>
+        <Text>{data.title}</Text>
+        <Text>
+          {data.email}
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.subHeader}>Profil</Text>
+        <Text>{data.introduction}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.subHeader}>Erfarenhet</Text>
+        {data.experiences.map((exp: any, idx: number) => (
+          <View key={idx} style={styles.expItem}>
+            <Text>
+              {exp.role} ({exp.year})
+            </Text>
+            <Text style={styles.expDescription}>{exp.description}</Text>
+            <Text style={styles.expDescription}>{exp.stack}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.subHeader}>Utbildning</Text>
+        <Text>{data.education}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.subHeader}>Färdigheter</Text>
+        <Text>{data.skills}</Text>
+      </View>
+    </Page>
+  </Document>
+);
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [formData, setFormData] = useState({
+    name: "",
+    title: "",
+    email: "",
+    education: "",
+    skills: "",
+    introduction: "",
+    experiences: [] as { role: string; year: string; description: string, stack: string }[],
+  });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const [currentExp, setCurrentExp] = useState({
+    role: "",
+    year: "",
+    description: "",
+    stack: ""
+  });
+
+  const addExperience = () => {
+    if (currentExp.role && currentExp.year && currentExp.description) {
+      setFormData({
+        ...formData,
+        experiences: [...formData.experiences, currentExp],
+      });
+      setCurrentExp({ role: "", year: "", description: "", stack: "" });
+    }
+  };
+
+  const isFormEmpty = !formData.name && !formData.title && !formData.email && !formData.education && !formData.skills && formData.experiences.length === 0;
+
+  return (
+    <main className="flex flex-col items-center p-8 bg-gray-900 min-h-screen">
+      <h1 className="text-3xl font-bold mb-6 text-gray-200">Skapa ditt CV</h1>
+
+      <div className="w-full max-w-2xl space-y-6">
+        <section className="bg-gray-600 shadow rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-4 text-gray-400">Personlig information</h2>
+          <div className="grid gap-3">
+            {["name", "title", "email"].map((key) => (
+              <input
+                key={key}
+                placeholder={key}
+                className="border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData[key as keyof typeof formData] as string}
+                onChange={(e) =>
+                  setFormData({ ...formData, [key]: e.target.value })
+                }
+              />
+            ))}
+          </div>
+          <div>
+            <textarea
+              placeholder="Kort introduktion om dig själv"
+              className="border rounded-lg p-3 mt-4 w-full focus:ring-2 focus:ring-blue-500 outline-none"
+              value={formData.introduction}
+              onChange={(e) =>
+                setFormData({ ...formData, introduction: e.target.value })
+              }
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+        </section>
+
+        <section className="bg-gray-600 shadow rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-4 text-gray-400">Erfarenheter</h2>
+          <div className="grid gap-3">
+            <input
+              placeholder="Jobbtitel (t.ex. Frontendutvecklare)"
+              className="border rounded-lg p-3"
+              value={currentExp.role}
+              onChange={(e) =>
+                setCurrentExp({ ...currentExp, role: e.target.value })
+              }
+            />
+            <input
+              placeholder="År (t.ex. 2021–2024)"
+              className="border rounded-lg p-3"
+              value={currentExp.year}
+              onChange={(e) =>
+                setCurrentExp({ ...currentExp, year: e.target.value })
+              }
+            />
+            <textarea
+              placeholder="Beskrivning av erfarenhet"
+              className="border rounded-lg p-3"
+              value={currentExp.description}
+              onChange={(e) =>
+                setCurrentExp({ ...currentExp, description: e.target.value })
+              }
+            />
+            <input 
+              placeholder="Tekniska färdigheter (t.ex. React, Node.js)"
+              className="border rounded-lg p-3"
+              value={currentExp.stack}
+              onChange={(e) =>
+                setCurrentExp({ ...currentExp, stack: e.target.value })
+              }
+            />
+            <button
+              type="button"
+              onClick={addExperience}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Lägg till erfarenhet
+            </button>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            {formData.experiences.map((exp, idx) => (
+              <div
+                key={idx}
+                className="border rounded-lg p-3 bg-gray-50 shadow-sm"
+              >
+                <p className="font-semibold">
+                  {exp.role} – <span className="text-gray-600">{exp.year}</span>
+                </p>
+                <p className="text-sm text-gray-700">{exp.description}</p>
+                <p className="text-sm text-gray-400">{exp.stack}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-gray-600 shadow rounded-xl p-6 grid gap-3">
+          <h2 className="text-lg font-semibold mb-4 text-gray-400">Utbildning & färdigheter</h2>
+          <input
+            placeholder="Utbildning"
+            className="border rounded-lg p-3"
+            value={formData.education}
+            onChange={(e) =>
+              setFormData({ ...formData, education: e.target.value })
+            }
+          />
+          <input
+            placeholder="Färdigheter"
+            className="border rounded-lg p-3"
+            value={formData.skills}
+            onChange={(e) =>
+              setFormData({ ...formData, skills: e.target.value })
+            }
+          />
+        </section>
+
+        <div className="flex justify-center">
+          <PDFDownloadLink
+            document={<MyCV data={formData} />}
+            fileName={PDF_FILE_NAME}
           >
-            Read our docs
-          </a>
+            {({ loading }) => (
+              <button 
+                disabled={isFormEmpty} 
+                className={`bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700 shadow ${isFormEmpty ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {loading ? "Genererar PDF..." : "Exportera som PDF"}
+              </button>
+            )}
+          </PDFDownloadLink>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }
