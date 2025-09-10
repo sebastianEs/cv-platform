@@ -3,73 +3,16 @@
 
 import { useState } from "react";
 import {
-  PDFDownloadLink,
-  Page,
-  Text,
-  View,
-  Document,
-  StyleSheet,
+  PDFDownloadLink
 } from "@react-pdf/renderer";
 import Header from "./components/Header";
 import TextField from "./components/TextField";
 import Card from "./components/Cards";
 import List from "./components/List";
 import Button from "./components/Button";
-import Head from "next/head";
+import MyCV from "./components/myCv";
 
 const PDF_FILE_NAME = "resume.pdf";
-
-const styles = StyleSheet.create({
-  page: { padding: 30, fontSize: 12 },
-  section: { marginBottom: 12 },
-  header: { fontSize: 18, marginBottom: 5, fontWeight: "bold", textTransform: "uppercase" },
-  subHeader: { fontSize: 14, marginBottom: 3, fontWeight: "semibold", textTransform: "uppercase" },
-  expItem: { marginBottom: 6 },
-  expTitle: { fontSize: 12, fontWeight: "bold" },
-  expDescription: { fontSize: 10 },
-});
-
-const MyCV = ({ data }: { data: any }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <Text style={styles.header}>{data.name}</Text>
-        <Text>{data.title}</Text>
-        <Text>
-          {data.email}
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.subHeader}>Profil</Text>
-        <Text>{data.introduction}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.subHeader}>Erfarenhet</Text>
-        {data.experiences.map((exp: any, idx: number) => (
-          <View key={idx} style={styles.expItem}>
-            <Text>
-              {exp.role} ({exp.year})
-            </Text>
-            <Text style={styles.expDescription}>{exp.description}</Text>
-            <Text style={styles.expDescription}>{exp.stack}</Text>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.subHeader}>Utbildning</Text>
-        <Text>{data.education}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.subHeader}>Färdigheter</Text>
-        <Text>{data.skills}</Text>
-      </View>
-    </Page>
-  </Document>
-);
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -177,7 +120,6 @@ export default function Home() {
           <div className="mt-4 space-y-3">
             <List items={formData.experiences.map(exp => ({ ...exp, stack: exp.stack.split(',') }))} />
         
-            
           </div>
         </Card>
 
