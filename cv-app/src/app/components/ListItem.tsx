@@ -9,19 +9,13 @@ interface ListItemProps {
 
 const ListItem: React.FC<ListItemProps> = ({ title, year, experience, stack }) => {
     return (
-        <div className="p-4 border rounded-lg shadow-md bg-white">
-            <h3 className="text-xl font-semibold">{title}</h3>
-            <p className="text-gray-500">{year}</p>
-            <p className="mt-2">{experience}</p>
-            <div className="mt-2">
-                <span className="font-semibold">Stack:</span>
-                <ul className="list-disc list-inside">
-                    {stack.map((item, index) => (
-                        <li key={index} className="text-gray-700">{item}</li>
-                    ))}
-                </ul>
-            </div>
-        </div>
+        <li className="p-2 border rounded-lg shadow-md flex flex-col max-h-24">
+            <p className="font-semibold">
+                {title} – <span className="text-gray-400">{year}</span>
+            </p>
+            <p className="text-sm text-gray-300 truncate">{experience}</p>
+            <p className="text-xs text-gray-400 truncate">{stack}</p>
+        </li>
     );
 };
 
