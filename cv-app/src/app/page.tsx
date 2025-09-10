@@ -10,6 +10,12 @@ import {
   Document,
   StyleSheet,
 } from "@react-pdf/renderer";
+import Header from "./components/Header";
+import TextField from "./components/TextField";
+import Card from "./components/Cards";
+import List from "./components/List";
+import Button from "./components/Button";
+import Head from "next/head";
 
 const PDF_FILE_NAME = "resume.pdf";
 
@@ -97,17 +103,16 @@ export default function Home() {
 
   return (
     <main className="flex flex-col items-center p-8 bg-gray-900 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-gray-200">Skapa ditt CV</h1>
+      <Header text="Skapa ditt CV" variant="h1" className="text-3xl font-bold mb-6 text-gray-200" />
 
       <div className="w-full max-w-2xl space-y-6">
-        <section className="bg-gray-600 shadow rounded-xl p-6">
-          <h2 className="text-lg font-semibold mb-4 text-gray-400">Personlig information</h2>
+        <Card>
+          <Header variant="h2" text="Personlig information" className="text-lg font-semibold mb-4 text-gray-400" />
           <div className="grid gap-3">
             {["name", "title", "email"].map((key) => (
-              <input
+              <TextField
                 key={key}
                 placeholder={key}
-                className="border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
                 value={formData[key as keyof typeof formData] as string}
                 onChange={(e) =>
                   setFormData({ ...formData, [key]: e.target.value })
@@ -125,22 +130,20 @@ export default function Home() {
               }
             />
           </div>
-        </section>
+        </Card>
 
-        <section className="bg-gray-600 shadow rounded-xl p-6">
-          <h2 className="text-lg font-semibold mb-4 text-gray-400">Erfarenheter</h2>
+        <Card>
+          <Header variant="h2" text="Erfarenheter" className="text-lg font-semibold mb-4 text-gray-400" />
           <div className="grid gap-3">
-            <input
+            <TextField
               placeholder="Jobbtitel (t.ex. Frontendutvecklare)"
-              className="border rounded-lg p-3"
               value={currentExp.role}
               onChange={(e) =>
                 setCurrentExp({ ...currentExp, role: e.target.value })
               }
             />
-            <input
+            <TextField
               placeholder="År (t.ex. 2021–2024)"
-              className="border rounded-lg p-3"
               value={currentExp.year}
               onChange={(e) =>
                 setCurrentExp({ ...currentExp, year: e.target.value })
@@ -154,58 +157,47 @@ export default function Home() {
                 setCurrentExp({ ...currentExp, description: e.target.value })
               }
             />
-            <input 
+            <TextField 
               placeholder="Tekniska färdigheter (t.ex. React, Node.js)"
-              className="border rounded-lg p-3"
               value={currentExp.stack}
               onChange={(e) =>
                 setCurrentExp({ ...currentExp, stack: e.target.value })
               }
             />
-            <button
-              type="button"
+            
+            <Button
               onClick={addExperience}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Lägg till erfarenhet
-            </button>
+              title="Lägg till erfarenhet"
+              size="medium"
+              color="blue"
+            />
+            
           </div>
 
           <div className="mt-4 space-y-3">
-            {formData.experiences.map((exp, idx) => (
-              <div
-                key={idx}
-                className="border rounded-lg p-3 bg-gray-50 shadow-sm"
-              >
-                <p className="font-semibold">
-                  {exp.role} – <span className="text-gray-600">{exp.year}</span>
-                </p>
-                <p className="text-sm text-gray-700">{exp.description}</p>
-                <p className="text-sm text-gray-400">{exp.stack}</p>
-              </div>
-            ))}
+            <List items={formData.experiences.map(exp => ({ ...exp, stack: exp.stack.split(',') }))} />
+        
+            
           </div>
-        </section>
+        </Card>
 
-        <section className="bg-gray-600 shadow rounded-xl p-6 grid gap-3">
-          <h2 className="text-lg font-semibold mb-4 text-gray-400">Utbildning & färdigheter</h2>
-          <input
+        <Card>
+          <Header variant="h2" text="Utbildning & färdigheter" className="text-lg font-semibold mb-4 text-gray-400" />
+          <TextField
             placeholder="Utbildning"
-            className="border rounded-lg p-3"
             value={formData.education}
             onChange={(e) =>
               setFormData({ ...formData, education: e.target.value })
             }
           />
-          <input
+          <TextField
             placeholder="Färdigheter"
-            className="border rounded-lg p-3"
             value={formData.skills}
             onChange={(e) =>
               setFormData({ ...formData, skills: e.target.value })
             }
           />
-        </section>
+        </Card>
 
         <div className="flex justify-center">
           <PDFDownloadLink
@@ -213,12 +205,14 @@ export default function Home() {
             fileName={PDF_FILE_NAME}
           >
             {({ loading }) => (
-              <button 
+              <Button 
+                title={loading ? "Genererar PDF..." : "Ladda ner CV som PDF"}
                 disabled={isFormEmpty} 
-                className={`bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700 shadow ${isFormEmpty ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                {loading ? "Genererar PDF..." : "Exportera som PDF"}
-              </button>
+                color="green"
+                size="large"
+                onClick={() => {}}
+              />
+                
             )}
           </PDFDownloadLink>
         </div>
